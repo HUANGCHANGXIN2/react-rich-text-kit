@@ -8,22 +8,16 @@
 
 ## 使用方式
 
-如果通过 GitHub Packages 安装，在业务项目的 `.npmrc` 中配置包 scope 的 registry。私有包的访问凭据请通过本机 npm 登录或 CI secret 配置，不要写入仓库。
-
-```ini
-@huangchangxin2:registry=https://npm.pkg.github.com
-```
-
 安装组件包：
 
 ```bash
 pnpm add @huangchangxin2/tiptap-rich-text-editor
 ```
 
-业务项目需要提供 React、Tiptap 和 UI 基础 peer dependencies：
+业务项目需要提供 React。如果项目还没有安装 React，请先安装：
 
 ```bash
-pnpm add react react-dom @tiptap/react @tiptap/starter-kit @tiptap/core @tiptap/pm @tiptap/extensions @tiptap/extension-highlight @tiptap/extension-horizontal-rule @tiptap/extension-image @tiptap/extension-list @tiptap/extension-subscript @tiptap/extension-superscript @tiptap/extension-text-align @tiptap/extension-typography @base-ui/react @floating-ui/react @radix-ui/react-dropdown-menu @radix-ui/react-popover class-variance-authority lodash.throttle react-hotkeys-hook
+pnpm add react react-dom
 ```
 
 在页面或应用入口中引入组件和样式：

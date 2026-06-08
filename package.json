@@ -44,8 +44,8 @@
     }
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -54,6 +54,10 @@
     "pack:local": "pnpm pack"
   },
   "peerDependencies": {
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
+  },
+  "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@floating-ui/react": "^0.27.19",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -73,38 +77,16 @@
     "@tiptap/starter-kit": "^3.26.0",
     "class-variance-authority": "^0.7.1",
     "lodash.throttle": "^4.1.1",
-    "react": ">=18 <20",
-    "react-dom": ">=18 <20",
     "react-hotkeys-hook": "^5.3.2"
   },
   "devDependencies": {
-    "@base-ui/react": "^1.5.0",
-    "@floating-ui/react": "^0.27.19",
-    "@radix-ui/react-dropdown-menu": "^2.1.16",
-    "@radix-ui/react-popover": "^1.1.15",
-    "@tiptap/core": "^3.26.0",
-    "@tiptap/extension-highlight": "^3.26.0",
-    "@tiptap/extension-horizontal-rule": "^3.26.0",
-    "@tiptap/extension-image": "^3.26.0",
-    "@tiptap/extension-list": "^3.26.0",
-    "@tiptap/extension-subscript": "^3.26.0",
-    "@tiptap/extension-superscript": "^3.26.0",
-    "@tiptap/extension-text-align": "^3.26.0",
-    "@tiptap/extension-typography": "^3.26.0",
-    "@tiptap/extensions": "^3.26.0",
-    "@tiptap/pm": "^3.26.0",
-    "@tiptap/react": "^3.26.0",
-    "@tiptap/starter-kit": "^3.26.0",
     "@types/lodash.throttle": "^4.1.9",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "class-variance-authority": "^0.7.1",
-    "lodash.throttle": "^4.1.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-hotkeys-hook": "^5.3.2",
     "sass-embedded": "^1.100.0",
     "typescript": "~6.0.3",
     "vite": "^8.0.8",
