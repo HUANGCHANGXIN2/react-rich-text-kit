@@ -1,8 +1,8 @@
-# @huangchangxin2/tiptap-rich-text-editor
+# @hcx0629/tiptap-rich-text-editor
 
 ## 项目简介
 
-`@huangchangxin2/tiptap-rich-text-editor` 是一个基于 Tiptap 和 Tiptap UI Simple Editor 抽取的 React 富文本编辑器组件。它内置中文工具栏文案、链接弹窗、图片上传入口和移动端工具栏适配，适合在后台管理、内容发布、表单编辑等场景中快速接入富文本能力。
+`@hcx0629/tiptap-rich-text-editor` 是一个基于 Tiptap 和 Tiptap UI Simple Editor 抽取的 React 富文本编辑器组件。它内置中文工具栏文案、链接弹窗、图片上传入口和移动端工具栏适配，适合在后台管理、内容发布、表单编辑等场景中快速接入富文本能力。
 
 组件会在内容变化时返回常用数据格式，包括 `html`、`json` 和 `text`。包内只导出编辑器组件、中文文案和相关 TypeScript 类型，样式通过独立的 `style.css` 子路径引入。
 
@@ -11,7 +11,7 @@
 安装组件包：
 
 ```bash
-pnpm add @huangchangxin2/tiptap-rich-text-editor
+pnpm add @hcx0629/tiptap-rich-text-editor
 ```
 
 业务项目需要提供 React。如果项目还没有安装 React，请先安装：
@@ -23,8 +23,8 @@ pnpm add react react-dom
 在页面或应用入口中引入组件和样式：
 
 ```tsx
-import { RichTextEditor } from '@huangchangxin2/tiptap-rich-text-editor'
-import '@huangchangxin2/tiptap-rich-text-editor/style.css'
+import { RichTextEditor } from '@hcx0629/tiptap-rich-text-editor'
+import '@hcx0629/tiptap-rich-text-editor/style.css'
 
 export function EditorDemo() {
   return (
@@ -42,9 +42,9 @@ export function EditorDemo() {
 
 ```tsx
 import { useState } from 'react'
-import { RichTextEditor } from '@huangchangxin2/tiptap-rich-text-editor'
-import type { JSONContent } from '@huangchangxin2/tiptap-rich-text-editor'
-import '@huangchangxin2/tiptap-rich-text-editor/style.css'
+import { RichTextEditor } from '@hcx0629/tiptap-rich-text-editor'
+import type { JSONContent } from '@hcx0629/tiptap-rich-text-editor'
+import '@hcx0629/tiptap-rich-text-editor/style.css'
 
 export function ControlledEditor() {
   const [content, setContent] = useState<JSONContent>({
@@ -137,8 +137,8 @@ export function ControlledEditor() {
 ```tsx
 'use client'
 
-import { RichTextEditor } from '@huangchangxin2/tiptap-rich-text-editor'
-import '@huangchangxin2/tiptap-rich-text-editor/style.css'
+import { RichTextEditor } from '@hcx0629/tiptap-rich-text-editor'
+import '@hcx0629/tiptap-rich-text-editor/style.css'
 
 export default function PageEditor() {
   return <RichTextEditor />

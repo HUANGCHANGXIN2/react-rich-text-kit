@@ -1,5 +1,5 @@
 {
-  "name": "@huangchangxin2/tiptap-rich-text-editor",
+  "name": "@hcx0629/tiptap-rich-text-editor",
   "version": "0.1.0",
   "description": "A reusable Chinese-localized rich text editor package based on Tiptap UI simple-editor.",
   "type": "module",
