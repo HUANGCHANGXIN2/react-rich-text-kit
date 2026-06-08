@@ -1,6 +1,6 @@
 {
   "name": "@hcx0629/tiptap-rich-text-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A reusable Chinese-localized rich text editor package based on Tiptap UI simple-editor.",
   "type": "module",
   "license": "MIT",
