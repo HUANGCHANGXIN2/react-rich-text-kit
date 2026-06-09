@@ -7,12 +7,12 @@
   "author": "HUANGCHANGXIN2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HUANGCHANGXIN2/tiptap-rich-text-editor.git"
+    "url": "git+https://github.com/HUANGCHANGXIN2/react-rich-text-kit.git"
   },
   "bugs": {
-    "url": "https://github.com/HUANGCHANGXIN2/tiptap-rich-text-editor/issues"
+    "url": "https://github.com/HUANGCHANGXIN2/react-rich-text-kit/issues"
   },
-  "homepage": "https://github.com/HUANGCHANGXIN2/tiptap-rich-text-editor#readme",
+  "homepage": "https://github.com/HUANGCHANGXIN2/react-rich-text-kit#readme",
   "keywords": [
     "tiptap",
     "rich-text-editor",
