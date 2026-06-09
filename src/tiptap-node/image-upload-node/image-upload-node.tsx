@@ -80,6 +80,38 @@ export interface UploadOptions {
   labels: RichTextEditorLabels
 }
 
+function generateUploadFileId(): string {
+  const webCrypto =
+    typeof globalThis !== "undefined" ? globalThis.crypto : undefined
+
+  if (typeof webCrypto?.randomUUID === "function") {
+    return webCrypto.randomUUID()
+  }
+
+  if (typeof webCrypto?.getRandomValues === "function") {
+    return Array.from(webCrypto.getRandomValues(new Uint8Array(16)))
+      .map((byte, index) =>
+        (index === 6
+          ? (byte & 0x0f) | 0x40
+          : index === 8
+            ? (byte & 0x3f) | 0x80
+            : byte
+        )
+          .toString(16)
+          .padStart(2, "0")
+      )
+      .join("")
+      .replace(
+        /^(.{8})(.{4})(.{4})(.{4})(.{12})$/,
+        "$1-$2-$3-$4-$5"
+      )
+  }
+
+  return `upload-${Date.now().toString(36)}-${Math.random()
+    .toString(36)
+    .slice(2, 10)}`
+}
+
 /**
  * Custom hook for managing multiple file uploads with progress tracking and cancellation
  */
@@ -94,12 +126,7 @@ function useFileUpload(options: UploadOptions) {
     }
 
     const abortController = new AbortController()
-    const fileId = typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : Array.from(crypto.getRandomValues(new Uint8Array(16)))
-          .map((b, i) => (i === 6 ? (b & 0x0f) | 0x40 : i === 8 ? (b & 0x3f) | 0x80 : b).toString(16).padStart(2, '0'))
-          .join('')
-          .replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5')
+    const fileId = generateUploadFileId()
 
     const newFileItem: FileItem = {
       id: fileId,
