@@ -1,5 +1,5 @@
 {
-  "name": "tiptap-rich-text-editor",
+  "name": "react-rich-text-kit",
   "version": "0.1.0",
   "description": "A reusable Chinese-localized rich text editor package based on Tiptap UI simple-editor.",
   "type": "module",
