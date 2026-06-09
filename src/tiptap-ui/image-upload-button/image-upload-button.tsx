@@ -233,7 +233,7 @@ export const ImageUploadButton = forwardRef<
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent align="end">
           <DropdownMenuGroup>
             <DropdownMenuItem
               asChild
