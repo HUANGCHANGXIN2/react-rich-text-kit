@@ -1,6 +1,6 @@
 {
-  "name": "@hcx0629/tiptap-rich-text-editor",
-  "version": "0.1.1",
+  "name": "tiptap-rich-text-editor",
+  "version": "0.2.0",
   "description": "A reusable Chinese-localized rich text editor package based on Tiptap UI simple-editor.",
   "type": "module",
   "license": "MIT",
@@ -21,11 +21,12 @@
     "wysiwyg"
   ],
   "sideEffects": [
-    "**/*.css",
-    "**/*.scss"
+    "./dist/style.css"
   ],
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/style.css",
     "README.md",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md"
@@ -39,13 +40,11 @@
       "import": "./dist/index.js"
     },
     "./style.css": {
-      "types": "./dist/style.css.d.ts",
       "default": "./dist/style.css"
     }
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -58,8 +57,6 @@
     "react-dom": ">=18 <20"
   },
   "dependencies": {
-    "@base-ui/react": "^1.5.0",
-    "@floating-ui/react": "^0.27.19",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-popover": "^1.1.15",
     "@tiptap/core": "^3.26.0",
@@ -74,13 +71,9 @@
     "@tiptap/extensions": "^3.26.0",
     "@tiptap/pm": "^3.26.0",
     "@tiptap/react": "^3.26.0",
-    "@tiptap/starter-kit": "^3.26.0",
-    "class-variance-authority": "^0.7.1",
-    "lodash.throttle": "^4.1.1",
-    "react-hotkeys-hook": "^5.3.2"
+    "@tiptap/starter-kit": "^3.26.0"
   },
   "devDependencies": {
-    "@types/lodash.throttle": "^4.1.9",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

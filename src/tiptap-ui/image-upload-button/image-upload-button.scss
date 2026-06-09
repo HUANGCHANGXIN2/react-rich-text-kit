@@ -1,0 +1,28 @@
+.tiptap-image-menu-item {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.tiptap-image-url-form {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) auto;
+  gap: 0.25rem;
+  align-items: center;
+  padding: 0.25rem;
+}
+
+.tiptap-image-url-input {
+  min-width: 0;
+}
+
+.tiptap-image-url-error {
+  grid-column: 1 / -1;
+  padding: 0 0.125rem;
+  color: var(--tt-color-red-dec-1);
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.dark .tiptap-image-url-error {
+  color: var(--tt-color-red-inc-2);
+}

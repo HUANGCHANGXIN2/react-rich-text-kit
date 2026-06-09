@@ -2,20 +2,16 @@
 
 import { forwardRef, useCallback } from "react"
 
-// --- Lib ---
-import { parseShortcutKeys } from "@/lib/tiptap-utils"
-
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
 // --- Tiptap UI ---
 import type { Mark, UseMarkConfig } from "@/tiptap-ui/mark-button"
-import { MARK_SHORTCUT_KEYS, useMark } from "@/tiptap-ui/mark-button"
+import { useMark } from "@/tiptap-ui/mark-button"
 
 // --- UI Primitives ---
 import type { ButtonProps } from "@/tiptap-ui-primitive/button"
 import { Button } from "@/tiptap-ui-primitive/button"
-import { Badge } from "@/tiptap-ui-primitive/badge"
 
 export interface MarkButtonProps
   extends Omit<ButtonProps, "type">, UseMarkConfig {
@@ -23,21 +19,7 @@ export interface MarkButtonProps
    * Optional text to display alongside the icon.
    */
   text?: string
-  /**
-   * Optional show shortcut keys in the button.
-   * @default false
-   */
-  showShortcut?: boolean
-}
-
-export function MarkShortcutBadge({
-  type,
-  shortcutKeys = MARK_SHORTCUT_KEYS[type],
-}: {
-  type: Mark
-  shortcutKeys?: string
-}) {
-  return <Badge>{parseShortcutKeys({ shortcutKeys })}</Badge>
+  showShortcut?: never
 }
 
 /**
@@ -53,7 +35,6 @@ export const MarkButton = forwardRef<HTMLButtonElement, MarkButtonProps>(
       text,
       hideWhenUnavailable = false,
       onToggled,
-      showShortcut = false,
       onClick,
       children,
       ...buttonProps
@@ -68,7 +49,6 @@ export const MarkButton = forwardRef<HTMLButtonElement, MarkButtonProps>(
       canToggle,
       isActive,
       Icon,
-      shortcutKeys,
     } = useMark({
       editor,
       type,
@@ -109,9 +89,6 @@ export const MarkButton = forwardRef<HTMLButtonElement, MarkButtonProps>(
           <>
             <Icon className="tiptap-button-icon" />
             {text && <span className="tiptap-button-text">{text}</span>}
-            {showShortcut && (
-              <MarkShortcutBadge type={type} shortcutKeys={shortcutKeys} />
-            )}
           </>
         )}
       </Button>

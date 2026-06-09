@@ -1,12 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
+import { useHotkeys } from "@/hooks/use-hotkeys"
 
 // --- Lib ---
 import { isExtensionAvailable } from "@/lib/tiptap-utils"
@@ -30,6 +30,11 @@ export interface UseImageUploadConfig {
    */
   hideWhenUnavailable?: boolean
   /**
+   * Whether image upload through files is enabled.
+   * @default true
+   */
+  enableFileUpload?: boolean
+  /**
    * Callback function called after a successful image insertion.
    */
   onInserted?: () => void
@@ -43,6 +48,21 @@ export function canInsertImage(editor: Editor | null): boolean {
   if (!isExtensionAvailable(editor, "imageUpload")) return false
 
   return editor.can().insertContent({ type: "imageUpload" })
+}
+
+/**
+ * Checks if an image URL can be inserted in the current editor state
+ */
+export function canInsertImageUrl(editor: Editor | null): boolean {
+  if (!editor || !editor.isEditable) return false
+  if (!isExtensionAvailable(editor, "image")) return false
+
+  return editor
+    .can()
+    .insertContent({
+      type: "image",
+      attrs: { src: "https://example.com/image.png" },
+    })
 }
 
 /**
@@ -74,13 +94,28 @@ export function insertImage(editor: Editor | null): boolean {
 }
 
 /**
+ * Inserts an image by URL in the editor
+ */
+export function insertImageUrl(editor: Editor | null, url: string): boolean {
+  if (!editor || !editor.isEditable) return false
+  if (!canInsertImageUrl(editor)) return false
+
+  try {
+    return editor.chain().focus().setImage({ src: url }).run()
+  } catch {
+    return false
+  }
+}
+
+/**
  * Determines if the image button should be shown
  */
 export function shouldShowButton(props: {
   editor: Editor | null
   hideWhenUnavailable: boolean
+  enableFileUpload: boolean
 }): boolean {
-  const { editor, hideWhenUnavailable } = props
+  const { editor, hideWhenUnavailable, enableFileUpload } = props
 
   if (!editor || !editor.isEditable) return false
 
@@ -88,10 +123,11 @@ export function shouldShowButton(props: {
     return true
   }
 
-  if (!isExtensionAvailable(editor, "imageUpload")) return false
+  const canUpload = enableFileUpload && canInsertImage(editor)
+  const canInsertUrl = canInsertImageUrl(editor)
 
   if (!editor.isActive("code")) {
-    return canInsertImage(editor)
+    return canUpload || canInsertUrl
   }
 
   return true
@@ -137,20 +173,25 @@ export function useImageUpload(config?: UseImageUploadConfig) {
   const {
     editor: providedEditor,
     hideWhenUnavailable = false,
+    enableFileUpload = true,
     onInserted,
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
   const isMobile = useIsBreakpoint()
   const [isVisible, setIsVisible] = useState<boolean>(true)
-  const canInsert = canInsertImage(editor)
+  const canUpload = enableFileUpload && canInsertImage(editor)
+  const canInsertUrl = canInsertImageUrl(editor)
+  const canInsert = canUpload || canInsertUrl
   const isActive = isImageActive(editor)
 
   useEffect(() => {
     if (!editor) return
 
     const handleSelectionUpdate = () => {
-      setIsVisible(shouldShowButton({ editor, hideWhenUnavailable }))
+      setIsVisible(
+        shouldShowButton({ editor, hideWhenUnavailable, enableFileUpload })
+      )
     }
 
     handleSelectionUpdate()
@@ -160,7 +201,7 @@ export function useImageUpload(config?: UseImageUploadConfig) {
     return () => {
       editor.off("selectionUpdate", handleSelectionUpdate)
     }
-  }, [editor, hideWhenUnavailable])
+  }, [editor, hideWhenUnavailable, enableFileUpload])
 
   const handleImage = useCallback(() => {
     if (!editor) return false
@@ -172,6 +213,19 @@ export function useImageUpload(config?: UseImageUploadConfig) {
     return success
   }, [editor, onInserted])
 
+  const handleImageUrl = useCallback(
+    (url: string) => {
+      if (!editor) return false
+
+      const success = insertImageUrl(editor, url)
+      if (success) {
+        onInserted?.()
+      }
+      return success
+    },
+    [editor, onInserted]
+  )
+
   useHotkeys(
     IMAGE_UPLOAD_SHORTCUT_KEY,
     (event) => {
@@ -179,7 +233,7 @@ export function useImageUpload(config?: UseImageUploadConfig) {
       handleImage()
     },
     {
-      enabled: isVisible && canInsert,
+      enabled: isVisible && canUpload,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
     }
@@ -189,7 +243,10 @@ export function useImageUpload(config?: UseImageUploadConfig) {
     isVisible,
     isActive,
     handleImage,
+    handleImageUrl,
     canInsert,
+    canUpload,
+    canInsertUrl,
     label: "Add image",
     shortcutKeys: IMAGE_UPLOAD_SHORTCUT_KEY,
     Icon: ImagePlusIcon,

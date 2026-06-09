@@ -1,22 +1,15 @@
 import { forwardRef, useCallback, useMemo } from "react"
 
-// --- Lib ---
-import { parseShortcutKeys } from "@/lib/tiptap-utils"
-
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
 // --- Tiptap UI ---
 import type { UseColorHighlightConfig } from "@/tiptap-ui/color-highlight-button"
-import {
-  COLOR_HIGHLIGHT_SHORTCUT_KEY,
-  useColorHighlight,
-} from "@/tiptap-ui/color-highlight-button"
+import { useColorHighlight } from "@/tiptap-ui/color-highlight-button"
 
 // --- UI Primitives ---
 import type { ButtonProps } from "@/tiptap-ui-primitive/button"
 import { Button } from "@/tiptap-ui-primitive/button"
-import { Badge } from "@/tiptap-ui-primitive/badge"
 
 // --- Styles ---
 
@@ -26,40 +19,17 @@ export interface ColorHighlightButtonProps
    * Optional text to display alongside the icon.
    */
   text?: string
-  /**
-   * Optional show shortcut keys in the button.
-   * @default false
-   */
-  showShortcut?: boolean
-}
-
-export function ColorHighlightShortcutBadge({
-  shortcutKeys = COLOR_HIGHLIGHT_SHORTCUT_KEY,
-}: {
-  shortcutKeys?: string
-}) {
-  return <Badge>{parseShortcutKeys({ shortcutKeys })}</Badge>
+  showShortcut?: never
 }
 
 /**
  * Button component for applying color highlights in a Tiptap editor.
  *
- * Supports two highlighting modes:
- * - "mark": Uses the highlight mark extension (default)
- * - "node": Uses the node background extension
- *
  * For custom button implementations, use the `useColorHighlight` hook instead.
  *
  * @example
  * ```tsx
- * // Mark-based highlighting (default)
  * <ColorHighlightButton highlightColor="yellow" />
- *
- * // Node-based background coloring
- * <ColorHighlightButton
- *   highlightColor="var(--tt-color-highlight-blue)"
- *   mode="node"
- * />
  *
  * // With custom callback
  * <ColorHighlightButton
@@ -81,7 +51,6 @@ export const ColorHighlightButton = forwardRef<
       hideWhenUnavailable = false,
       mode = "mark",
       onApplied,
-      showShortcut = false,
       onClick,
       children,
       style,
@@ -97,7 +66,6 @@ export const ColorHighlightButton = forwardRef<
       isActive,
       handleColorHighlight,
       label,
-      shortcutKeys,
     } = useColorHighlight({
       editor,
       highlightColor,
@@ -156,9 +124,6 @@ export const ColorHighlightButton = forwardRef<
               }
             />
             {text && <span className="tiptap-button-text">{text}</span>}
-            {showShortcut && (
-              <ColorHighlightShortcutBadge shortcutKeys={shortcutKeys} />
-            )}
           </>
         )}
       </Button>

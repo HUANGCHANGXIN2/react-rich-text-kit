@@ -13,6 +13,7 @@ export default defineConfig({
       entryRoot: 'src',
       insertTypesEntry: true,
       copyDtsFiles: true,
+      rollupTypes: true,
       beforeWriteFile: (filePath) => {
         if (filePath.endsWith('vite.config.d.ts')) {
           return false
@@ -38,14 +39,8 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime',
-        '@base-ui/react/merge-props',
-        '@base-ui/react/use-render',
-        '@floating-ui/react',
         '@radix-ui/react-dropdown-menu',
         '@radix-ui/react-popover',
-        'class-variance-authority',
-        'lodash.throttle',
-        'react-hotkeys-hook',
         /^@tiptap\//,
       ],
     },

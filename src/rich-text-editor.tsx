@@ -115,14 +115,14 @@ function emitChange(editor: Editor, onChange?: RichTextEditorProps['onChange']) 
 function MainToolbarContent({
   labels,
   hiddenTools,
-  hasImageUpload,
+  canUploadImage,
   isMobile,
   onHighlighterClick,
   onLinkClick,
 }: {
   labels: RichTextEditorLabels
   hiddenTools: ReadonlySet<RichTextEditorTool>
-  hasImageUpload: boolean
+  canUploadImage: boolean
   isMobile: boolean
   onHighlighterClick: () => void
   onLinkClick: () => void
@@ -317,13 +317,15 @@ function MainToolbarContent({
         )}
       </ToolbarGroup>
 
-      {hasImageUpload && visible(hiddenTools, 'imageUpload') && (
+      {visible(hiddenTools, 'imageUpload') && (
         <>
           <ToolbarSeparator />
           <ToolbarGroup>
             <ImageUploadButton
               aria-label={labels.imageUpload}
               tooltip={labels.imageUpload}
+              enableFileUpload={canUploadImage}
+              labels={labels}
             />
           </ToolbarGroup>
         </>
@@ -496,7 +498,7 @@ export function RichTextEditor({
             <MainToolbarContent
               labels={resolvedLabels}
               hiddenTools={hiddenToolSet}
-              hasImageUpload={Boolean(uploadImage)}
+              canUploadImage={Boolean(uploadImage)}
               isMobile={isMobile}
               onHighlighterClick={() => setMobileView('highlighter')}
               onLinkClick={() => setMobileView('link')}

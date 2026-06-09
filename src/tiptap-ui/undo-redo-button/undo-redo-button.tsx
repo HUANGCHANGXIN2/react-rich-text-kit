@@ -2,9 +2,6 @@
 
 import { forwardRef, useCallback } from "react"
 
-// --- Lib ---
-import { parseShortcutKeys } from "@/lib/tiptap-utils"
-
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
@@ -13,15 +10,11 @@ import type {
   UndoRedoAction,
   UseUndoRedoConfig,
 } from "@/tiptap-ui/undo-redo-button"
-import {
-  UNDO_REDO_SHORTCUT_KEYS,
-  useUndoRedo,
-} from "@/tiptap-ui/undo-redo-button"
+import { useUndoRedo } from "@/tiptap-ui/undo-redo-button"
 
 // --- UI Primitives ---
 import type { ButtonProps } from "@/tiptap-ui-primitive/button"
 import { Button } from "@/tiptap-ui-primitive/button"
-import { Badge } from "@/tiptap-ui-primitive/badge"
 
 export interface UndoRedoButtonProps
   extends Omit<ButtonProps, "type">, UseUndoRedoConfig {
@@ -29,21 +22,7 @@ export interface UndoRedoButtonProps
    * Optional text to display alongside the icon.
    */
   text?: string
-  /**
-   * Optional show shortcut keys in the button.
-   * @default false
-   */
-  showShortcut?: boolean
-}
-
-export function HistoryShortcutBadge({
-  action,
-  shortcutKeys = UNDO_REDO_SHORTCUT_KEYS[action],
-}: {
-  action: UndoRedoAction
-  shortcutKeys?: string
-}) {
-  return <Badge>{parseShortcutKeys({ shortcutKeys })}</Badge>
+  showShortcut?: never
 }
 
 /**
@@ -62,7 +41,6 @@ export const UndoRedoButton = forwardRef<
       text,
       hideWhenUnavailable = false,
       onExecuted,
-      showShortcut = false,
       onClick,
       children,
       ...buttonProps
@@ -70,8 +48,7 @@ export const UndoRedoButton = forwardRef<
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
-    const { isVisible, handleAction, label, canExecute, Icon, shortcutKeys } =
-      useUndoRedo({
+    const { isVisible, handleAction, label, canExecute, Icon } = useUndoRedo({
         editor,
         action,
         hideWhenUnavailable,
@@ -109,12 +86,6 @@ export const UndoRedoButton = forwardRef<
           <>
             <Icon className="tiptap-button-icon" />
             {text && <span className="tiptap-button-text">{text}</span>}
-            {showShortcut && (
-              <HistoryShortcutBadge
-                action={action}
-                shortcutKeys={shortcutKeys}
-              />
-            )}
           </>
         )}
       </Button>

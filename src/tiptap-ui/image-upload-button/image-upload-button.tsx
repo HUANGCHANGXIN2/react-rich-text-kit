@@ -1,8 +1,6 @@
-import { forwardRef, useCallback } from "react"
+import { forwardRef, useCallback, useState } from "react"
 
 // --- Lib ---
-import { parseShortcutKeys } from "@/lib/tiptap-utils"
-
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
@@ -13,13 +11,63 @@ import {
   useImageUpload,
 } from "@/tiptap-ui/image-upload-button"
 
+// --- Icons ---
+import { ChevronDownIcon } from "@/tiptap-icons/chevron-down-icon"
+import { CornerDownLeftIcon } from "@/tiptap-icons/corner-down-left-icon"
+import { LinkIcon } from "@/tiptap-icons/link-icon"
+
 // --- UI Primitives ---
 import type { ButtonProps } from "@/tiptap-ui-primitive/button"
 import { Button } from "@/tiptap-ui-primitive/button"
-import { Badge } from "@/tiptap-ui-primitive/badge"
+import { ButtonGroup } from "@/tiptap-ui-primitive/button-group"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/tiptap-ui-primitive/dropdown-menu"
+import { Input } from "@/tiptap-ui-primitive/input"
+import type { RichTextEditorLabels } from "@/labels"
 
 type IconProps = React.SVGProps<SVGSVGElement>
 type IconComponent = ({ className, ...props }: IconProps) => React.ReactElement
+type ImageUploadButtonLabels = Pick<
+  RichTextEditorLabels,
+  | "imageUpload"
+  | "imageUploadFromFile"
+  | "imageUploadFromUrl"
+  | "imageUrlPlaceholder"
+  | "imageUrlInvalid"
+  | "applyImageUrl"
+>
+
+const DEFAULT_LABELS: ImageUploadButtonLabels = {
+  imageUpload: "添加图片",
+  imageUploadFromFile: "上传图片",
+  imageUploadFromUrl: "图片 URL",
+  imageUrlPlaceholder: "粘贴图片 URL...",
+  imageUrlInvalid: "请输入有效的图片 URL",
+  applyImageUrl: "插入图片",
+}
+
+function normalizeImageUrl(value: string): string | null {
+  const trimmedUrl = value.trim()
+
+  if (!trimmedUrl) return null
+
+  try {
+    const url = new URL(trimmedUrl)
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.href
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
 
 export interface ImageUploadButtonProps
   extends Omit<ButtonProps, "type">, UseImageUploadConfig {
@@ -27,23 +75,17 @@ export interface ImageUploadButtonProps
    * Optional text to display alongside the icon.
    */
   text?: string
-  /**
-   * Optional show shortcut keys in the button.
-   * @default false
-   */
-  showShortcut?: boolean
+  showShortcut?: never
   /**
    * Optional custom icon component to render instead of the default.
    */
   icon?: React.MemoExoticComponent<IconComponent> | React.FC<IconProps>
-}
-
-export function ImageShortcutBadge({
-  shortcutKeys = IMAGE_UPLOAD_SHORTCUT_KEY,
-}: {
-  shortcutKeys?: string
-}) {
-  return <Badge>{parseShortcutKeys({ shortcutKeys })}</Badge>
+  /**
+   * Whether the dropdown should use a modal.
+   * @default false
+   */
+  modal?: boolean
+  labels?: Partial<ImageUploadButtonLabels>
 }
 
 /**
@@ -60,37 +102,100 @@ export const ImageUploadButton = forwardRef<
       editor: providedEditor,
       text,
       hideWhenUnavailable = false,
+      enableFileUpload = true,
       onInserted,
-      showShortcut = false,
       onClick,
       icon: CustomIcon,
+      modal = false,
+      labels,
       children,
       ...buttonProps
     },
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
+    const [isOpen, setIsOpen] = useState(false)
+    const [isUrlFormOpen, setIsUrlFormOpen] = useState(false)
+    const [imageUrl, setImageUrl] = useState("")
+    const [urlError, setUrlError] = useState<string | null>(null)
+    const resolvedLabels = { ...DEFAULT_LABELS, ...labels }
     const {
       isVisible,
       canInsert,
+      canUpload,
+      canInsertUrl,
       handleImage,
+      handleImageUrl,
       label,
       isActive,
-      shortcutKeys,
       Icon,
     } = useImageUpload({
       editor,
       hideWhenUnavailable,
+      enableFileUpload,
       onInserted,
     })
+
+    const handleOpenChange = useCallback((open: boolean) => {
+      setIsOpen(open)
+
+      if (!open) {
+        setIsUrlFormOpen(false)
+        setUrlError(null)
+      }
+    }, [])
 
     const handleClick = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event)
-        if (event.defaultPrevented) return
-        handleImage()
       },
-      [handleImage, onClick]
+      [onClick]
+    )
+
+    const handleFileUpload = useCallback(() => {
+      if (!canUpload) return
+
+      const success = handleImage()
+      if (success) {
+        setIsOpen(false)
+      }
+    }, [canUpload, handleImage])
+
+    const handleUrlOption = useCallback(
+      (event: Event) => {
+        if (!canInsertUrl) return
+
+        event.preventDefault()
+        setIsUrlFormOpen(true)
+        setUrlError(null)
+      },
+      [canInsertUrl]
+    )
+
+    const handleImageUrlSubmit = useCallback(
+      (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        const normalizedUrl = normalizeImageUrl(imageUrl)
+
+        if (!normalizedUrl) {
+          setUrlError(resolvedLabels.imageUrlInvalid)
+          return
+        }
+
+        const success = handleImageUrl(normalizedUrl)
+
+        if (success) {
+          setImageUrl("")
+          setUrlError(null)
+          setIsUrlFormOpen(false)
+          setIsOpen(false)
+          return
+        }
+
+        setUrlError(resolvedLabels.imageUrlInvalid)
+      },
+      [handleImageUrl, imageUrl, resolvedLabels.imageUrlInvalid]
     )
 
     if (!isVisible) {
@@ -98,31 +203,122 @@ export const ImageUploadButton = forwardRef<
     }
 
     const RenderIcon = CustomIcon ?? Icon
+    const buttonLabel = resolvedLabels.imageUpload || label
 
     return (
-      <Button
-        type="button"
-        variant="ghost"
-        data-active-state={isActive ? "on" : "off"}
-        role="button"
-        tabIndex={-1}
-        disabled={!canInsert}
-        data-disabled={!canInsert}
-        aria-label={label}
-        aria-pressed={isActive}
-        tooltip={label}
-        onClick={handleClick}
-        {...buttonProps}
-        ref={ref}
-      >
-        {children ?? (
-          <>
-            <RenderIcon className="tiptap-button-icon" />
-            {text && <span className="tiptap-button-text">{text}</span>}
-            {showShortcut && <ImageShortcutBadge shortcutKeys={shortcutKeys} />}
-          </>
-        )}
-      </Button>
+      <DropdownMenu modal={modal} open={isOpen} onOpenChange={handleOpenChange}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            data-active-state={isActive ? "on" : "off"}
+            role="button"
+            tabIndex={-1}
+            disabled={!canInsert}
+            data-disabled={!canInsert}
+            aria-label={buttonLabel}
+            aria-pressed={isActive}
+            tooltip={buttonLabel}
+            onClick={handleClick}
+            {...buttonProps}
+            ref={ref}
+          >
+            {children ?? (
+              <>
+                <RenderIcon className="tiptap-button-icon" />
+                {text && <span className="tiptap-button-text">{text}</span>}
+                <ChevronDownIcon className="tiptap-button-dropdown-small" />
+              </>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="start">
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              asChild
+              disabled={!canUpload}
+              onSelect={handleFileUpload}
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={!canUpload}
+                showTooltip={false}
+                className="tiptap-image-menu-item"
+              >
+                <RenderIcon className="tiptap-button-icon" />
+                <span className="tiptap-button-text">
+                  {resolvedLabels.imageUploadFromFile}
+                </span>
+              </Button>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              asChild
+              disabled={!canInsertUrl}
+              onSelect={handleUrlOption}
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={!canInsertUrl}
+                showTooltip={false}
+                className="tiptap-image-menu-item"
+              >
+                <LinkIcon className="tiptap-button-icon" />
+                <span className="tiptap-button-text">
+                  {resolvedLabels.imageUploadFromUrl}
+                </span>
+              </Button>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          {isUrlFormOpen && (
+            <>
+              <DropdownMenuSeparator />
+              <form
+                className="tiptap-image-url-form"
+                onSubmit={handleImageUrlSubmit}
+                noValidate
+              >
+                <Input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(event) => {
+                    setImageUrl(event.target.value)
+                    setUrlError(null)
+                  }}
+                  placeholder={resolvedLabels.imageUrlPlaceholder}
+                  autoFocus
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  className="tiptap-image-url-input"
+                  aria-invalid={Boolean(urlError)}
+                />
+
+                <ButtonGroup>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={!canInsertUrl || !imageUrl.trim()}
+                    showTooltip={false}
+                    title={resolvedLabels.applyImageUrl}
+                    aria-label={resolvedLabels.applyImageUrl}
+                  >
+                    <CornerDownLeftIcon className="tiptap-button-icon" />
+                  </Button>
+                </ButtonGroup>
+
+                {urlError && (
+                  <span className="tiptap-image-url-error">{urlError}</span>
+                )}
+              </form>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
 )

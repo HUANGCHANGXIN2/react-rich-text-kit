@@ -1,20 +1,13 @@
 import { forwardRef, Fragment, useMemo } from "react"
 
-// --- Tiptap UI Primitive ---
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/tiptap-ui-primitive/tooltip"
-
 // --- Lib ---
 import { cn, parseShortcutKeys } from "@/lib/tiptap-utils"
-
 
 export type ButtonVariant = "ghost" | "primary"
 export type ButtonSize = "small" | "default" | "large"
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   showTooltip?: boolean
   tooltip?: React.ReactNode
   shortcutKeys?: string
@@ -39,6 +32,18 @@ export const ShortcutDisplay: React.FC<{ shortcuts: string[] }> = ({
   )
 }
 
+function getTooltipTitle(
+  tooltip: React.ReactNode,
+  shortcuts: string[],
+  explicitTitle?: string
+) {
+  if (explicitTitle) return explicitTitle
+  if (typeof tooltip !== "string" && typeof tooltip !== "number") return undefined
+
+  const shortcutText = shortcuts.join("+")
+  return shortcutText ? `${tooltip} (${shortcutText})` : String(tooltip)
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -47,6 +52,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       tooltip,
       showTooltip = true,
       shortcutKeys,
+      title,
       variant,
       size,
       ...props
@@ -57,39 +63,22 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       () => parseShortcutKeys({ shortcutKeys }),
       [shortcutKeys]
     )
-
-    if (!tooltip || !showTooltip) {
-      return (
-        <button
-          data-slot="tiptap-button"
-          className={cn("tiptap-button", className)}
-          ref={ref}
-          data-style={variant}
-          data-size={size}
-          {...props}
-        >
-          {children}
-        </button>
-      )
-    }
+    const tooltipTitle = showTooltip
+      ? getTooltipTitle(tooltip, shortcuts, title)
+      : title
 
     return (
-      <Tooltip delay={200}>
-        <TooltipTrigger
-          data-slot="tiptap-button"
-          className={cn("tiptap-button", className)}
-          ref={ref}
-          data-style={variant}
-          data-size={size}
-          {...props}
-        >
-          {children}
-        </TooltipTrigger>
-        <TooltipContent>
-          {tooltip}
-          <ShortcutDisplay shortcuts={shortcuts} />
-        </TooltipContent>
-      </Tooltip>
+      <button
+        data-slot="tiptap-button"
+        className={cn("tiptap-button", className)}
+        ref={ref}
+        data-style={variant}
+        data-size={size}
+        title={tooltipTitle}
+        {...props}
+      >
+        {children}
+      </button>
     )
   }
 )

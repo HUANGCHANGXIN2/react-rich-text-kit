@@ -2,9 +2,6 @@
 
 import { forwardRef, useCallback } from "react"
 
-// --- Lib ---
-import { parseShortcutKeys } from "@/lib/tiptap-utils"
-
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
@@ -13,15 +10,11 @@ import type {
   TextAlign,
   UseTextAlignConfig,
 } from "@/tiptap-ui/text-align-button"
-import {
-  TEXT_ALIGN_SHORTCUT_KEYS,
-  useTextAlign,
-} from "@/tiptap-ui/text-align-button"
+import { useTextAlign } from "@/tiptap-ui/text-align-button"
 
 // --- UI Primitives ---
 import type { ButtonProps } from "@/tiptap-ui-primitive/button"
 import { Button } from "@/tiptap-ui-primitive/button"
-import { Badge } from "@/tiptap-ui-primitive/badge"
 
 type IconProps = React.SVGProps<SVGSVGElement>
 type IconComponent = ({ className, ...props }: IconProps) => React.ReactElement
@@ -32,25 +25,11 @@ export interface TextAlignButtonProps
    * Optional text to display alongside the icon.
    */
   text?: string
-  /**
-   * Optional show shortcut keys in the button.
-   * @default false
-   */
-  showShortcut?: boolean
+  showShortcut?: never
   /**
    * Optional custom icon component to render instead of the default.
    */
   icon?: React.MemoExoticComponent<IconComponent> | React.FC<IconProps>
-}
-
-export function TextAlignShortcutBadge({
-  align,
-  shortcutKeys = TEXT_ALIGN_SHORTCUT_KEYS[align],
-}: {
-  align: TextAlign
-  shortcutKeys?: string
-}) {
-  return <Badge>{parseShortcutKeys({ shortcutKeys })}</Badge>
 }
 
 /**
@@ -69,7 +48,6 @@ export const TextAlignButton = forwardRef<
       text,
       hideWhenUnavailable = false,
       onAligned,
-      showShortcut = false,
       onClick,
       icon: CustomIcon,
       children,
@@ -85,7 +63,6 @@ export const TextAlignButton = forwardRef<
       canAlign,
       isActive,
       Icon,
-      shortcutKeys,
     } = useTextAlign({
       editor,
       align,
@@ -128,12 +105,6 @@ export const TextAlignButton = forwardRef<
           <>
             <RenderIcon className="tiptap-button-icon" />
             {text && <span className="tiptap-button-text">{text}</span>}
-            {showShortcut && (
-              <TextAlignShortcutBadge
-                align={align}
-                shortcutKeys={shortcutKeys}
-              />
-            )}
           </>
         )}
       </Button>

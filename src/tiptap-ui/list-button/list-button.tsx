@@ -1,19 +1,15 @@
 import { forwardRef, useCallback } from "react"
 
-// --- Lib ---
-import { parseShortcutKeys } from "@/lib/tiptap-utils"
-
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
 // --- UI Primitives ---
 import type { ButtonProps } from "@/tiptap-ui-primitive/button"
 import { Button } from "@/tiptap-ui-primitive/button"
-import { Badge } from "@/tiptap-ui-primitive/badge"
 
 // --- Tiptap UI ---
 import type { ListType, UseListConfig } from "@/tiptap-ui/list-button"
-import { LIST_SHORTCUT_KEYS, useList } from "@/tiptap-ui/list-button"
+import { useList } from "@/tiptap-ui/list-button"
 
 export interface ListButtonProps
   extends Omit<ButtonProps, "type">, UseListConfig {
@@ -21,21 +17,7 @@ export interface ListButtonProps
    * Optional text to display alongside the icon.
    */
   text?: string
-  /**
-   * Optional show shortcut keys in the button.
-   * @default false
-   */
-  showShortcut?: boolean
-}
-
-export function ListShortcutBadge({
-  type,
-  shortcutKeys = LIST_SHORTCUT_KEYS[type],
-}: {
-  type: ListType
-  shortcutKeys?: string
-}) {
-  return <Badge>{parseShortcutKeys({ shortcutKeys })}</Badge>
+  showShortcut?: never
 }
 
 /**
@@ -51,7 +33,6 @@ export const ListButton = forwardRef<HTMLButtonElement, ListButtonProps>(
       text,
       hideWhenUnavailable = false,
       onToggled,
-      showShortcut = false,
       onClick,
       children,
       ...buttonProps
@@ -65,7 +46,6 @@ export const ListButton = forwardRef<HTMLButtonElement, ListButtonProps>(
       isActive,
       handleToggle,
       label,
-      shortcutKeys,
       Icon,
     } = useList({
       editor,
@@ -107,9 +87,6 @@ export const ListButton = forwardRef<HTMLButtonElement, ListButtonProps>(
           <>
             <Icon className="tiptap-button-icon" />
             {text && <span className="tiptap-button-text">{text}</span>}
-            {showShortcut && (
-              <ListShortcutBadge type={type} shortcutKeys={shortcutKeys} />
-            )}
           </>
         )}
       </Button>

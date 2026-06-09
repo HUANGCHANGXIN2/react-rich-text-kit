@@ -55,6 +55,11 @@ export interface RichTextEditorLabels {
   alignRight: string
   alignJustify: string
   imageUpload: string
+  imageUploadFromFile: string
+  imageUploadFromUrl: string
+  imageUrlPlaceholder: string
+  imageUrlInvalid: string
+  applyImageUrl: string
   imageUploadDrop: string
   imageUploadHint: (limit: number, maxSize: number) => string
   imageUploading: (count: number) => string
@@ -102,6 +107,11 @@ export const zhCNLabels: RichTextEditorLabels = {
   alignRight: '右对齐',
   alignJustify: '两端对齐',
   imageUpload: '添加图片',
+  imageUploadFromFile: '上传图片',
+  imageUploadFromUrl: '图片 URL',
+  imageUrlPlaceholder: '粘贴图片 URL...',
+  imageUrlInvalid: '请输入有效的图片 URL',
+  applyImageUrl: '插入图片',
   imageUploadDrop: '点击上传或拖拽图片到这里',
   imageUploadHint: (limit, maxSize) =>
     `最多 ${limit} 个文件，每个不超过 ${maxSize / 1024 / 1024}MB。`,

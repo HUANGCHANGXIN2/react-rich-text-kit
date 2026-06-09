@@ -1,71 +1,67 @@
-import { mergeProps } from "@base-ui/react/merge-props"
-import { useRender } from "@base-ui/react/use-render"
-import { cva, type VariantProps } from "class-variance-authority"
+import { forwardRef } from "react"
 import { cn } from "@/lib/tiptap-utils"
 import { Separator } from "@/tiptap-ui-primitive/separator"
 
-const buttonGroupVariants = cva("tiptap-button-group", {
-  variants: {
-    orientation: {
-      horizontal: "tiptap-button-group-horizontal",
-      vertical: "tiptap-button-group-vertical",
-    },
-  },
-  defaultVariants: {
-    orientation: "horizontal",
-  },
-})
+type ButtonGroupOrientation = "horizontal" | "vertical"
 
-function ButtonGroup({
-  className,
-  orientation,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof buttonGroupVariants>) {
-  return (
-    <div
-      role="group"
-      data-slot="tiptap-button-group"
-      data-orientation={orientation}
-      className={cn(buttonGroupVariants({ orientation }), className)}
-      {...props}
-    />
+function getButtonGroupClassName(orientation: ButtonGroupOrientation) {
+  return cn(
+    "tiptap-button-group",
+    orientation === "vertical"
+      ? "tiptap-button-group-vertical"
+      : "tiptap-button-group-horizontal"
   )
 }
 
-function ButtonGroupText({
-  className,
-  render,
-  ...props
-}: useRender.ComponentProps<"div">) {
-  return useRender({
-    defaultTagName: "div",
-    props: mergeProps<"div">(
-      { className: cn("tiptap-button-group-text", className) },
-      props
-    ),
-    render,
-    state: { slot: "tiptap-button-group-text" },
-  })
-}
+const ButtonGroup = forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & {
+    orientation?: ButtonGroupOrientation
+  }
+>(({ className, orientation = "horizontal", ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      role="group"
+      data-slot="tiptap-button-group"
+      data-orientation={orientation}
+      className={cn(getButtonGroupClassName(orientation), className)}
+      {...props}
+    />
+  )
+})
 
-function ButtonGroupSeparator({
-  className,
-  orientation = "vertical",
-  ...props
-}: React.ComponentProps<typeof Separator>) {
+ButtonGroup.displayName = "ButtonGroup"
+
+const ButtonGroupText = forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn("tiptap-button-group-text", className)}
+        {...props}
+      />
+    )
+  }
+)
+
+ButtonGroupText.displayName = "ButtonGroupText"
+
+const ButtonGroupSeparator = forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<typeof Separator>
+>(({ className, orientation = "vertical", ...props }, ref) => {
   return (
     <Separator
+      ref={ref}
       data-slot="tiptap-button-group-separator"
       orientation={orientation}
       className={cn("tiptap-button-group-separator", className)}
       {...props}
     />
   )
-}
+})
 
-export {
-  ButtonGroup,
-  ButtonGroupSeparator,
-  ButtonGroupText,
-  buttonGroupVariants,
-}
+ButtonGroupSeparator.displayName = "ButtonGroupSeparator"
+
+export { ButtonGroup, ButtonGroupSeparator, ButtonGroupText }

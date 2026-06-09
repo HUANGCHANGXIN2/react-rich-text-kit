@@ -12,11 +12,9 @@
 @use './tiptap-node/paragraph-node/paragraph-node';
 
 @use './tiptap-ui/color-highlight-button/color-highlight-button';
+@use './tiptap-ui/image-upload-button/image-upload-button';
 @use './tiptap-ui/link-popover/link-popover';
 
-@use './tiptap-ui-primitive/badge/badge-colors';
-@use './tiptap-ui-primitive/badge/badge-group';
-@use './tiptap-ui-primitive/badge/badge';
 @use './tiptap-ui-primitive/button/button-colors';
 @use './tiptap-ui-primitive/button/button';
 @use './tiptap-ui-primitive/button-group/button-group';
@@ -26,4 +24,3 @@
 @use './tiptap-ui-primitive/popover/popover';
 @use './tiptap-ui-primitive/separator/separator';
 @use './tiptap-ui-primitive/toolbar/toolbar';
-@use './tiptap-ui-primitive/tooltip/tooltip';

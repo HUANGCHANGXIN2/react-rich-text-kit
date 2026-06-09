@@ -1,17 +1,11 @@
 import type { Node as PMNode } from '@tiptap/pm/model'
-import type { Transaction } from '@tiptap/pm/state'
 import {
   AllSelection,
   NodeSelection,
   Selection,
   TextSelection,
 } from '@tiptap/pm/state'
-import { cellAround, CellSelection } from '@tiptap/pm/tables'
-import {
-  findParentNodeClosestToPos,
-  type Editor,
-  type NodeWithPos,
-} from '@tiptap/react'
+import { type Editor } from '@tiptap/react'
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -459,56 +453,6 @@ export function sanitizeUrl(
 }
 
 /**
- * Update a single attribute on multiple nodes.
- *
- * @param tr - The transaction to mutate
- * @param targets - Array of { node, pos }
- * @param attrName - Attribute key to update
- * @param next - New value OR updater function receiving previous value
- *               Pass `undefined` to remove the attribute.
- * @returns true if at least one node was updated, false otherwise
- */
-export function updateNodesAttr<A extends string = string, V = unknown>(
-  tr: Transaction,
-  targets: readonly NodeWithPos[],
-  attrName: A,
-  next: V | ((prev: V | undefined) => V | undefined)
-): boolean {
-  if (!targets.length) return false
-
-  let changed = false
-
-  for (const { pos } of targets) {
-    // Always re-read from the transaction's current doc
-    const currentNode = tr.doc.nodeAt(pos)
-    if (!currentNode) continue
-
-    const prevValue = (currentNode.attrs as Record<string, unknown>)[
-      attrName
-    ] as V | undefined
-    const resolvedNext =
-      typeof next === 'function'
-        ? (next as (p: V | undefined) => V | undefined)(prevValue)
-        : next
-
-    if (prevValue === resolvedNext) continue
-
-    const nextAttrs: Record<string, unknown> = { ...currentNode.attrs }
-    if (resolvedNext === undefined) {
-      // Remove the key entirely instead of setting null
-      delete nextAttrs[attrName]
-    } else {
-      nextAttrs[attrName] = resolvedNext
-    }
-
-    tr.setNodeMarkup(pos, undefined, nextAttrs)
-    changed = true
-  }
-
-  return changed
-}
-
-/**
  * Selects the entire content of the current block node if the selection is empty.
  * If the selection is not empty, it does nothing.
  * @param editor The Tiptap editor instance
@@ -547,59 +491,6 @@ export function selectCurrentBlockContent(editor: Editor) {
       }
     }
   }
-}
-
-/**
- * Retrieves all nodes of specified types from the current selection.
- * @param selection The current editor selection
- * @param allowedNodeTypes An array of node type names to look for (e.g., ["image", "table"])
- * @returns An array of objects containing the node and its position
- */
-export function getSelectedNodesOfType(
-  selection: Selection,
-  allowedNodeTypes: string[]
-): NodeWithPos[] {
-  const results: NodeWithPos[] = []
-  const allowed = new Set(allowedNodeTypes)
-
-  if (selection instanceof CellSelection) {
-    selection.forEachCell((node: PMNode, pos: number) => {
-      if (allowed.has(node.type.name)) {
-        results.push({ node, pos })
-      }
-    })
-    return results
-  }
-
-  if (selection instanceof NodeSelection) {
-    const { node, from: pos } = selection
-    if (node && allowed.has(node.type.name)) {
-      results.push({ node, pos })
-    }
-    return results
-  }
-
-  const { $anchor } = selection
-  const cell = cellAround($anchor)
-
-  if (cell) {
-    const cellNode = selection.$anchor.doc.nodeAt(cell.pos)
-    if (cellNode && allowed.has(cellNode.type.name)) {
-      results.push({ node: cellNode, pos: cell.pos })
-      return results
-    }
-  }
-
-  // Fallback: find parent nodes of allowed types
-  const parentNode = findParentNodeClosestToPos($anchor, (node) =>
-    allowed.has(node.type.name)
-  )
-
-  if (parentNode) {
-    results.push({ node: parentNode.node, pos: parentNode.pos })
-  }
-
-  return results
 }
 
 /**
